@@ -1,0 +1,27 @@
+- hosts: 192.168.43.131
+  vars:
+  - dvd_dir_namenode: /nn
+  tasks:
+  - copy:
+      src: /root/hadoop-1.2.1-1.x86_64.rpm
+      dest: /root/
+  - copy:
+      src: /root/jdk-8u171-linux-x64.rpm
+      dest: /root/  
+  - shell: rpm -ivh jdk-8u171-linux-x64.rpm
+    ignore_errors: yes
+  - shell: rpm -ivh hadoop-1.2.1-1.x86_64.rpm --force
+    ignore_errors: yes  
+  - template:
+     dest: /etc/hadoop/hdfs-site.xml
+     src: /root/name-hdfs.txt
+  - template:
+     dest: /etc/hadoop/core-site.xml
+     src: /root/name-core.txt
+  - file:
+     path: "{{dvd_dir_namenode}}"
+     state: directory
+  - shell: "echo Y | hadoop namenode -format"
+  - shell: hadoop-daemon.sh start namenode
+  - debug:
+     msg: "NameNode has Started"
